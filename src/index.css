@@ -83,6 +83,14 @@ h4 {
   margin-bottom: 2.4rem;
 }
 
+.timeout{
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 4rem;
+  margin-top: -1rem;
+  color: var(--color-theme);
+}
+
 .start {
   display: flex;
   flex-direction: column;

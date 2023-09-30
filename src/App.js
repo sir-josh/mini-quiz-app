@@ -1,5 +1,8 @@
 import React, { useEffect, useReducer } from "react";
+import StartQuiz from "./StartQuiz";
 import Header from "./Header";
+import Loader from "./Loader";
+import Error from "./Error";
 import Main from "./Main";
 
 const initialState = {
@@ -21,7 +24,8 @@ function reducer(currState, action) {
 }
 
 const App = () => {
-	const [state, dispatch] = useReducer(reducer, initialState);
+	const [{questions, status}, dispatch] = useReducer(reducer, initialState);
+  const numQuestions = questions.length;
 
 	useEffect(() => {
 		fetch("http://localhost:8000/questions")
@@ -37,8 +41,9 @@ const App = () => {
 		<div className="app">
 			<Header />
 			<Main>
-				<p>1/5</p>
-				<p>React Quiz</p>
+				{status === "loading" && <Loader />}
+				{status === "error" && <Error />}
+				{status === "ready" && <StartQuiz numQuestions={numQuestions} />}
 			</Main>
 		</div>
 	);
