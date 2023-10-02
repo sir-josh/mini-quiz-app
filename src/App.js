@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 import StartQuiz from "./StartQuiz";
+import Question from "./Question";
 import Header from "./Header";
 import Loader from "./Loader";
 import Error from "./Error";
@@ -17,6 +18,8 @@ function reducer(currState, action) {
 			return { ...currState, questions: action.payload, status: "ready" };
 		case "dataFailed":
 			return { ...currState, status: "error" };
+		case "start":
+			return { ...currState, status: "active" };
 
 		default:
 			throw new Error("Action unknown");
@@ -24,8 +27,8 @@ function reducer(currState, action) {
 }
 
 const App = () => {
-	const [{questions, status}, dispatch] = useReducer(reducer, initialState);
-  const numQuestions = questions.length;
+	const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+	const numQuestions = questions.length;
 
 	useEffect(() => {
 		fetch("http://localhost:8000/questions")
@@ -43,7 +46,13 @@ const App = () => {
 			<Main>
 				{status === "loading" && <Loader />}
 				{status === "error" && <Error />}
-				{status === "ready" && <StartQuiz numQuestions={numQuestions} />}
+				{status === "ready" && (
+					<StartQuiz
+						numQuestions={numQuestions}
+						dispatch={dispatch}
+					/>
+				)}
+				{status === "active" && <Question />}
 			</Main>
 		</div>
 	);
