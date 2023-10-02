@@ -10,6 +10,7 @@ const initialState = {
 	questions: [],
 	// 'loading', 'error', 'ready', 'active', 'finished'
 	status: "loading",
+  questionIndex: 0,
 };
 
 function reducer(currState, action) {
@@ -27,7 +28,7 @@ function reducer(currState, action) {
 }
 
 const App = () => {
-	const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+	const [{ questions, status, questionIndex }, dispatch] = useReducer(reducer, initialState);
 	const numQuestions = questions.length;
 
 	useEffect(() => {
@@ -52,7 +53,7 @@ const App = () => {
 						dispatch={dispatch}
 					/>
 				)}
-				{status === "active" && <Question />}
+				{status === "active" && <Question question={questions[questionIndex]} />}
 			</Main>
 		</div>
 	);
