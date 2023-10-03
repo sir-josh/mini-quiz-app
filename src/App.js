@@ -5,6 +5,7 @@ import Header from "./Header";
 import Loader from "./Loader";
 import Error from "./Error";
 import Main from "./Main";
+import NextButton from "./NextButton";
 
 const initialState = {
 	questions: [],
@@ -33,6 +34,12 @@ function reducer(currState, action) {
 					action.payload === question.correctOption
 						? currState.score + question.points
 						: currState.score,
+			};
+		case "nextQuestion":
+			return {
+				...currState,
+				questionIndex: currState.questionIndex + 1,
+				answer: null,
 			};
 
 		default:
@@ -68,11 +75,14 @@ const App = () => {
 					/>
 				)}
 				{status === "active" && (
-					<Question
-						question={questions[questionIndex]}
-						dispatch={dispatch}
-						answer={answer}
-					/>
+					<>
+						<Question
+							question={questions[questionIndex]}
+							dispatch={dispatch}
+							answer={answer}
+						/>
+						<NextButton dispatch={dispatch} answer={answer} />
+					</>
 				)}
 			</Main>
 		</div>
