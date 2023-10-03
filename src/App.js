@@ -53,6 +53,12 @@ function reducer(currState, action) {
 						? currState.score
 						: currState.highscore,
 			};
+		case "restart":
+			return {
+				...initialState,
+				questions: currState.questions,
+				status: "ready",
+			};
 
 		default:
 			throw new Error("Action unknown");
@@ -118,6 +124,7 @@ const App = () => {
 						score={score}
 						totalPossibleScore={totalPossibleScore}
 						highscore={highscore}
+						dispatch={dispatch}
 					/>
 				)}
 			</Main>
