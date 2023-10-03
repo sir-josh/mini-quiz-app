@@ -1,13 +1,17 @@
 import React, { useEffect, useReducer } from "react";
+import FinishScreen from "./FinishScreen";
+import ProgressBar from "./ProgressBar";
+import NextButton from "./NextButton";
 import StartQuiz from "./StartQuiz";
 import Question from "./Question";
+import Footer from "./Footer";
 import Header from "./Header";
 import Loader from "./Loader";
+import Timer from "./Timer";
 import Error from "./Error";
 import Main from "./Main";
-import NextButton from "./NextButton";
-import ProgressBar from "./ProgressBar";
-import FinishScreen from "./FinishScreen";
+
+const SECS_PER_QUESTION = 30;
 
 const initialState = {
 	questions: [],
@@ -17,6 +21,7 @@ const initialState = {
 	answer: null,
 	score: 0,
 	highscore: 0,
+	secondsRemaining: null, //Time in minutes
 };
 
 function reducer(currState, action) {
@@ -26,7 +31,12 @@ function reducer(currState, action) {
 		case "dataFailed":
 			return { ...currState, status: "error" };
 		case "start":
-			return { ...currState, status: "active" };
+			return {
+				...currState,
+				status: "active",
+				secondsRemaining:
+					currState.questions.length * SECS_PER_QUESTION,
+			};
 		case "newAnswer":
 			const question = currState.questions.at(currState.questionIndex);
 
@@ -59,6 +69,19 @@ function reducer(currState, action) {
 				questions: currState.questions,
 				status: "ready",
 			};
+		case "startTime":
+			return {
+				...currState,
+				secondsRemaining: currState.secondsRemaining - 1,
+				status:
+					currState.secondsRemaining === 0
+						? "finished"
+						: currState.status,
+				highscore:
+					currState.secondsRemaining === 0
+						? Math.max(currState.score, currState.highscore)
+						: currState.highscore,
+			};
 
 		default:
 			throw new Error("Action unknown");
@@ -67,8 +90,17 @@ function reducer(currState, action) {
 
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initialState);
-	const { questions, status, questionIndex, answer, score, highscore } =
-		state;
+	const {
+		questions,
+		status,
+		questionIndex,
+		answer,
+		score,
+		highscore,
+		secondsRemaining,
+	} = state;
+
+  const quizTime = SECS_PER_QUESTION * questions.length;
 	const numQuestions = questions.length;
 	const totalPossibleScore = questions.reduce(
 		(prev, curr) => prev + curr.points,
@@ -95,6 +127,7 @@ const App = () => {
 					<StartQuiz
 						numQuestions={numQuestions}
 						dispatch={dispatch}
+            quizTime={quizTime}
 					/>
 				)}
 				{status === "active" && (
@@ -111,12 +144,18 @@ const App = () => {
 							dispatch={dispatch}
 							answer={answer}
 						/>
-						<NextButton
-							dispatch={dispatch}
-							answer={answer}
-							index={questionIndex}
-							numQuestions={numQuestions}
-						/>
+						<Footer>
+							<Timer
+								dispatch={dispatch}
+								secondsRemaining={secondsRemaining}
+							/>
+							<NextButton
+								dispatch={dispatch}
+								answer={answer}
+								index={questionIndex}
+								numQuestions={numQuestions}
+							/>
+						</Footer>
 					</>
 				)}
 				{status === "finished" && (
